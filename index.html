@@ -23,14 +23,14 @@
     }
 
     #santo-card {
-      position: relative; /* necessário para o botão sobre a imagem */
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
       text-align: center;
-      width: 400px;       
-      min-height: 500px;  
+      width: 400px;
+      min-height: 500px;
       background: white;
       border-radius: 16px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.2);
@@ -41,7 +41,7 @@
     #santo-card img {
       width: 300px;
       height: 350px;
-      object-fit: contain; 
+      object-fit: contain;
       border-radius: 12px;
       margin-bottom: 15px;
       transition: opacity 0.4s ease-in-out;
@@ -81,14 +81,36 @@
       font-size: 1rem;
       color: #555;
     }
+
+    /* Barra de loading */
+    #loadingBar {
+      width: 80%;
+      height: 12px;
+      background: #ddd;
+      border-radius: 6px;
+      margin-top: 20px;
+      overflow: hidden;
+      display: none;
+    }
+
+    #loadingFill {
+      height: 100%;
+      width: 0%;
+      background: #27ae60;
+      transition: width 2s linear;
+    }
   </style>
 </head>
 <body>
   <h1>Sorteio de Santos</h1>
 
   <div id="santo-card">
-    <img id="santoImagem" src="https://us.123rf.com/450wm/adiruch/adiruch1602/adiruch160200224/51636149-businessman-silhouette-with-question-mark-sign-anonymous-suspicious-concept.jpg"Santo">
+    <img id="santoImagem" src="https://us.123rf.com/450wm/adiruch/adiruch1602/adiruch160200224/51636149-businessman-silhouette-with-question-mark-sign-anonymous-suspicious-concept.jpg" alt="Santo">
+    
     <button id="sortearBtn" onclick="sortearSanto()">Clique para sortear</button>
+    
+    <div id="loadingBar"><div id="loadingFill"></div></div>
+
     <h2 id="santoNome"></h2>
     <p id="santoFrase"></p>
   </div>
@@ -129,22 +151,31 @@
       const btn = document.getElementById("sortearBtn");
       const nome = document.getElementById("santoNome");
       const frase = document.getElementById("santoFrase");
+      const loadingBar = document.getElementById("loadingBar");
+      const loadingFill = document.getElementById("loadingFill");
 
-      img.style.opacity = 0;
-      btn.style.opacity = 0;
+      // Esconde botão e mostra barra de loading
+      btn.style.display = "none";
+      nome.style.display = "none";
+      frase.style.display = "none";
+      loadingBar.style.display = "block";
+      loadingFill.style.width = "0%";
 
+      setTimeout(() => { loadingFill.style.width = "100%"; }, 50);
+
+      // Após 2 segundos mostra o resultado
       setTimeout(() => {
         img.src = sorteado.imagem;
         nome.textContent = sorteado.nome;
         frase.textContent = sorteado.frase;
         img.style.opacity = 1;
 
-        // Esconde o botão e mostra os textos
-        btn.style.display = "none";
+        loadingBar.style.display = "none";
         nome.style.display = "block";
         frase.style.display = "block";
-      }, 400);
+      }, 2200);
     }
   </script>
 </body>
 </html>
+
