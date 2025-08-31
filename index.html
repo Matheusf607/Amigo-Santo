@@ -1,181 +1,243 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sorteio de Santos</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sorteio de Santos - Polaroid Realista</title>
 
-    h1 {
-      color: #2c3e50;
-      margin-bottom: 20px;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Special+Elite&display=swap" rel="stylesheet">
 
-    #santo-card {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      text-align: center;
-      width: 400px;
-      min-height: 500px;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-      overflow: hidden;
-      padding: 20px;
-    }
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f0f0f0;
+    padding: 50px;
+    position: relative;
+    overflow-x: hidden;
+  }
 
-    #santo-card img {
-      width: 300px;
-      height: 350px;
-      object-fit: contain;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      transition: opacity 0.4s ease-in-out;
-    }
+  h1 {
+    color: #333;
+    margin-bottom: 40px;
+    z-index: 2;
+    position: relative;
+  }
 
-    #sortearBtn {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: rgba(39, 174, 96, 0.9);
-      color: white;
-      border: none;
-      padding: 14px 28px;
-      font-size: 18px;
-      cursor: pointer;
-      border-radius: 12px;
-      transition: background 0.3s, opacity 0.4s;
-      z-index: 10;
-    }
+  /* Fundo com mini-polaroids desfocadas */
+  .background-polaroids {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none; /* para não atrapalhar cliques */
+  }
 
-    #sortearBtn:hover {
-      background-color: rgba(33, 145, 80, 0.9);
-    }
+  .bg-santo {
+    position: absolute;
+    width: 100px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    transform: rotate(-5deg);
+    filter: blur(6px) brightness(0.5);
+    opacity: 0.25;
+    transition: transform 0.3s;
+  }
 
-    #santo-card h2, #santo-card p {
-      color: #2c3e50;
-      display: none;
-    }
+  /* posições criativas */
+  .bg-santo:nth-child(1) { top: 5%; left: 10%; transform: rotate(-8deg); }
+  .bg-santo:nth-child(2) { top: 15%; left: 70%; transform: rotate(6deg); }
+  .bg-santo:nth-child(3) { top: 55%; left: 20%; transform: rotate(-4deg); }
+  .bg-santo:nth-child(4) { top: 60%; left: 60%; transform: rotate(5deg); }
+  .bg-santo:nth-child(5) { top: 75%; left: 80%; transform: rotate(-3deg); }
 
-    #santo-card h2 {
-      margin: 10px 0 5px;
-      font-size: 1.4rem;
-    }
+  .polaroid {
+    width: 320px;
+    background: white;
+    padding: 10px 10px 60px 10px; 
+    border-radius: 8px;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+    display: inline-block;
+    margin: 20px auto;
+    position: relative;
+    transform: rotate(-2deg);
+    transition: transform 0.3s;
+    z-index: 1;
+  }
 
-    #santo-card p {
-      font-size: 1rem;
-      color: #555;
-    }
+  .polaroid:hover {
+    transform: rotate(0deg) scale(1.03);
+  }
 
-    /* Barra de loading */
-    #loadingBar {
-      width: 80%;
-      height: 12px;
-      background: #ddd;
-      border-radius: 6px;
-      margin-top: 20px;
-      overflow: hidden;
-      display: none;
-    }
+  .polaroid img {
+    width: 100%;
+    height: 350px;
+    object-fit: contain;
+    border-radius: 6px;
+    display: block;
+    filter: grayscale(100%) brightness(120%);
+    opacity: 0;
+    transition: filter 5s linear, opacity 2s ease-in;
+  }
 
-    #loadingFill {
-      height: 100%;
-      width: 0%;
-      background: #27ae60;
-      transition: width 2s linear;
-    }
-  </style>
+  .loader-text {
+    font-family: 'Special Elite', monospace;
+    font-size: 1rem;
+    margin: 10px 0;
+    display: none;
+  }
+
+  .loader-bar-container {
+    width: 90%;
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+    margin: 10px auto;
+    overflow: hidden;
+    display: none;
+  }
+
+  .loader-bar {
+    width: 0%;
+    height: 100%;
+    background: #3498db;
+    transition: width 0.1s linear;
+  }
+
+  .santo-nome {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.6rem;
+    margin-top: 10px;
+  }
+
+  .santo-frase, .santo-texto {
+    font-family: 'Special Elite', monospace;
+    font-size: 1rem;
+    margin: 5px 10px;
+  }
+
+  .santo-frase {
+    font-style: italic;
+  }
+
+  #sortearBtn {
+    padding: 10px 20px;
+    font-size: 14px;
+    background: #ffffff; /* mesmo fundo da polaroid */
+    color: #333;
+    font-family: 'Special Elite', monospace;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #sortearBtn:hover {
+    background: #f0f0f0;
+  }
+</style>
 </head>
+
 <body>
-  <h1>Sorteio de Santos</h1>
+<h1>Conheça seu Santo amigo!</h1>
 
-  <div id="santo-card">
-    <img id="santoImagem" src="https://us.123rf.com/450wm/adiruch/adiruch1602/adiruch160200224/51636149-businessman-silhouette-with-question-mark-sign-anonymous-suspicious-concept.jpg" alt="Santo">
-    
-    <button id="sortearBtn" onclick="sortearSanto()">Clique para sortear</button>
-    
-    <div id="loadingBar"><div id="loadingFill"></div></div>
+<div class="background-polaroids">
+  <img src="https://upload.wikimedia.org/wikipedia/pt/thumb/7/78/Carlo_Acutis.jpg/250px-Carlo_Acutis.jpg" class="bg-santo">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXhdKqEy7JDsIq1YNI9ttfyIO7utRM2B6LHA&s" class="bg-santo">
+  <img src="https://comshalom.org/wp-content/uploads/2015/01/08/editorportal/JPII.oculos.jpg" class="bg-santo">
+  <img src="https://www.acn.org.br/wp-content/uploads/2021/02/ACN-Verdadeira-Fisionomia-dos-Santos-Teresinha-Parcendo-mais-velha.jpg" class="bg-santo">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s" class="bg-santo">
+</div>
 
-    <h2 id="santoNome"></h2>
-    <p id="santoFrase"></p>
+<div class="polaroid">
+  <img id="santo-img" src="https://w7.pngwing.com/pngs/528/713/png-transparent-woman-question-mark-female-1000-people-presentation-woman.png" alt="Santo">
+  <div class="loader-text" id="loader-text">Revelando foto, balance o celular para revelar</div>
+  <div class="loader-bar-container" id="loader-bar-container">
+    <div class="loader-bar" id="loader-bar"></div>
   </div>
+  <div class="santo-nome" id="santo-nome"></div>
+  <div class="santo-frase" id="santo-frase"></div>
+  <div class="santo-texto" id="santo-texto"></div>
+  <button id="sortearBtn" onclick="sortearSanto()">Conhecer amigo</button>
+</div>
 
-  <script>
-    const santos = [
-      {
-        nome: "Carlo Acutis",
-        imagem: "https://upload.wikimedia.org/wikipedia/pt/thumb/7/78/Carlo_Acutis.jpg/250px-Carlo_Acutis.jpg",
-        frase: "Contando um pouco sobre Carlo."
-      },
-      {
-        nome: "Pier Giorgio Frassati",
-        imagem: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXhdKqEy7JDsIq1YNI9ttfyIO7utRM2B6LHA&s",
-        frase: "Exemplo de jovem que viveu a fé de forma intensa."
-      },
-      {
-        nome: "Santa Teresinha do Menino Jesus",
-        imagem: "https://www.acn.org.br/wp-content/uploads/2021/02/ACN-Verdadeira-Fisionomia-dos-Santos-Teresinha-Parcendo-mais-velha.jpg",
-        frase: "Conheça mais sobre Santa Teresinha, a Pequena Flor."
-      },
-      {
-        nome: "São João Paulo II",
-        imagem: "https://comshalom.org/wp-content/uploads/2015/01/08/editorportal/JPII.oculos.jpg",
-        frase: "Um grande apóstolo do amor e da juventude."
-      },
-      {
-        nome: "Chiara Luce",
-        imagem: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s",
-        frase: "Exemplo de fé e alegria mesmo diante da dor."
-      }
-    ];
+<script>
+const santos = [
+  {
+    nome: "Carlo Acutis",
+    img: "https://upload.wikimedia.org/wikipedia/pt/thumb/7/78/Carlo_Acutis.jpg/250px-Carlo_Acutis.jpg",
+    frase: "A Eucaristia é a minha estrada para o Céu.",
+    texto: "Jovem italiano apaixonado pela tecnologia, criou um site para divulgar os milagres eucarísticos do mundo. Morreu aos 15 anos.  👉 Com sua amizade, ele pode te ensinar que a santidade é acessível a todos."
+  },
+  {
+    nome: "Pier Giorgio Frassati",
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXhdKqEy7JDsIq1YNI9ttfyIO7utRM2B6LHA&s",
+    frase: "Viver sem fé não é viver, é apenas vegetar.",
+    texto: "Italiano apaixonado por esportes, amigos e caridade. 👉 Com sua amizade, ele pode te ensinar que a fé se vive na amizade, no esporte e na ajuda aos mais pobres."
+  },
+  {
+    nome: "São João Paulo II",
+    img: "https://comshalom.org/wp-content/uploads/2015/01/08/editorportal/JPII.oculos.jpg",
+    frase: "Não tenhais medo. Abri as portas a Cristo!",
+    texto: "Papa de 1978 a 2005, marcando a história com sua proximidade com os jovens. 👉 Com sua amizade, ele pode te ensinar a não ter medo de viver a fé com ousadia e alegria."
+  },
+  {
+    nome: "Santa Teresinha do Menino Jesus",
+    img: "https://www.acn.org.br/wp-content/uploads/2021/02/ACN-Verdadeira-Fisionomia-dos-Santos-Teresinha-Parcendo-mais-velha.jpg",
+    frase: "Quero passar o meu Céu fazendo o bem sobre a Terra.",
+    texto: "Religiosa carmelita, deixou o ensinamento do “caminho da pequena via”. 👉 Com sua amizade, ela pode te ensinar que não é preciso grandes feitos para ser santo, mas fazer tudo com amor."
+  },
+  {
+    nome: "Chiara Luce Badano",
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s",
+    frase: "Se tu queres, Jesus, eu também quero.",
+    texto: "Italiana alegre e generosa, enfrentou um câncer raro aos 18 anos. 👉 Com sua amizade, ela pode te ensinar que até na dor é possível encontrar sentido e viver com amor."
+  }
+];
 
-    function sortearSanto() {
-      const sorteado = santos[Math.floor(Math.random() * santos.length)];
+function sortearSanto() {
+  const img = document.getElementById("santo-img");
+  const nome = document.getElementById("santo-nome");
+  const frase = document.getElementById("santo-frase");
+  const texto = document.getElementById("santo-texto");
+  const btn = document.getElementById("sortearBtn");
+  const loaderText = document.getElementById("loader-text");
+  const loaderBarContainer = document.getElementById("loader-bar-container");
+  const loaderBar = document.getElementById("loader-bar");
 
-      const img = document.getElementById("santoImagem");
-      const btn = document.getElementById("sortearBtn");
-      const nome = document.getElementById("santoNome");
-      const frase = document.getElementById("santoFrase");
-      const loadingBar = document.getElementById("loadingBar");
-      const loadingFill = document.getElementById("loadingFill");
+  btn.style.display = "none";
+  loaderText.style.display = "block";
+  loaderBarContainer.style.display = "block";
 
-      // Esconde botão e mostra barra de loading
-      btn.style.display = "none";
-      nome.style.display = "none";
-      frase.style.display = "none";
-      loadingBar.style.display = "block";
-      loadingFill.style.width = "0%";
+  let width = 0;
+  const sorteado = santos[Math.floor(Math.random() * santos.length)];
 
-      setTimeout(() => { loadingFill.style.width = "100%"; }, 50);
+  const interval = setInterval(() => {
+    if (width >= 100) {
+      clearInterval(interval);
+      loaderText.style.display = "none";
+      loaderBarContainer.style.display = "none";
 
-      // Após 2 segundos mostra o resultado
-      setTimeout(() => {
-        img.src = sorteado.imagem;
-        nome.textContent = sorteado.nome;
-        frase.textContent = sorteado.frase;
-        img.style.opacity = 1;
+      img.src = sorteado.img;
+      img.style.opacity = 1;
+      img.style.filter = "grayscale(0%) brightness(100%)";
 
-        loadingBar.style.display = "none";
-        nome.style.display = "block";
-        frase.style.display = "block";
-      }, 2200);
+      nome.innerText = sorteado.nome;
+      frase.innerText = sorteado.frase;
+      texto.innerText = sorteado.texto;
+    } else {
+      width += 2;
+      loaderBar.style.width = width + "%";
     }
-  </script>
+  }, 100);
+}
+</script>
 </body>
 </html>
 
