@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sorteio de Santos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    #santo-card {
+      position: relative; /* necessário para o botão sobre a imagem */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+      width: 400px;       
+      min-height: 500px;  
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    #santo-card img {
+      width: 300px;
+      height: 350px;
+      object-fit: contain; 
+      border-radius: 12px;
+      margin-bottom: 15px;
+      transition: opacity 0.4s ease-in-out;
+    }
+
+    #sortearBtn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(39, 174, 96, 0.9);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: background 0.3s, opacity 0.4s;
+      z-index: 10;
+    }
+
+    #sortearBtn:hover {
+      background-color: rgba(33, 145, 80, 0.9);
+    }
+
+    #santo-card h2, #santo-card p {
+      color: #2c3e50;
+      display: none;
+    }
+
+    #santo-card h2 {
+      margin: 10px 0 5px;
+      font-size: 1.4rem;
+    }
+
+    #santo-card p {
+      font-size: 1rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sorteio de Santos</h1>
+
+  <div id="santo-card">
+    <img id="santoImagem" src="https://us.123rf.com/450wm/adiruch/adiruch1602/adiruch160200224/51636149-businessman-silhouette-with-question-mark-sign-anonymous-suspicious-concept.jpg"Santo">
+    <button id="sortearBtn" onclick="sortearSanto()">Clique para sortear</button>
+    <h2 id="santoNome"></h2>
+    <p id="santoFrase"></p>
+  </div>
+
+  <script>
+    const santos = [
+      {
+        nome: "Carlo Acutis",
+        imagem: "https://upload.wikimedia.org/wikipedia/pt/thumb/7/78/Carlo_Acutis.jpg/250px-Carlo_Acutis.jpg",
+        frase: "Contando um pouco sobre Carlo."
+      },
+      {
+        nome: "Pier Giorgio Frassati",
+        imagem: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXhdKqEy7JDsIq1YNI9ttfyIO7utRM2B6LHA&s",
+        frase: "Exemplo de jovem que viveu a fé de forma intensa."
+      },
+      {
+        nome: "Santa Teresinha do Menino Jesus",
+        imagem: "https://www.acn.org.br/wp-content/uploads/2021/02/ACN-Verdadeira-Fisionomia-dos-Santos-Teresinha-Parcendo-mais-velha.jpg",
+        frase: "Conheça mais sobre Santa Teresinha, a Pequena Flor."
+      },
+      {
+        nome: "São João Paulo II",
+        imagem: "https://comshalom.org/wp-content/uploads/2015/01/08/editorportal/JPII.oculos.jpg",
+        frase: "Um grande apóstolo do amor e da juventude."
+      },
+      {
+        nome: "Chiara Luce",
+        imagem: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s",
+        frase: "Exemplo de fé e alegria mesmo diante da dor."
+      }
+    ];
+
+    function sortearSanto() {
+      const sorteado = santos[Math.floor(Math.random() * santos.length)];
+
+      const img = document.getElementById("santoImagem");
+      const btn = document.getElementById("sortearBtn");
+      const nome = document.getElementById("santoNome");
+      const frase = document.getElementById("santoFrase");
+
+      img.style.opacity = 0;
+      btn.style.opacity = 0;
+
+      setTimeout(() => {
+        img.src = sorteado.imagem;
+        nome.textContent = sorteado.nome;
+        frase.textContent = sorteado.frase;
+        img.style.opacity = 1;
+
+        // Esconde o botão e mostra os textos
+        btn.style.display = "none";
+        nome.style.display = "block";
+        frase.style.display = "block";
+      }, 400);
+    }
+  </script>
+</body>
+</html>
