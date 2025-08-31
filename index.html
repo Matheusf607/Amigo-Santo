@@ -10,50 +10,51 @@
 <style>
   body {
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 50px;
     text-align: center;
     background: #f0f0f0;
-    padding: 50px;
-    position: relative;
     overflow-x: hidden;
+    position: relative;
   }
 
   h1 {
     color: #333;
     margin-bottom: 40px;
-    z-index: 2;
     position: relative;
+    z-index: 10;
   }
 
-  /* Fundo com mini-polaroids desfocadas */
-  .background-polaroids {
+  /* Fundo com polaroids desfocadas */
+  .background-polaroid {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    pointer-events: none;
+    overflow: hidden;
     z-index: 0;
-    pointer-events: none; /* para não atrapalhar cliques */
   }
 
-  .bg-santo {
-    position: absolute;
-    width: 100px;
-    height: 120px;
+  .background-polaroid img {
+    width: 120px;
+    height: 140px;
     object-fit: cover;
     border-radius: 6px;
-    transform: rotate(-5deg);
-    filter: blur(6px) brightness(0.5);
-    opacity: 0.25;
-    transition: transform 0.3s;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    position: absolute;
+    opacity: 0.1;
+    filter: blur(3px);
+    animation: float linear infinite;
   }
 
-  /* posições criativas */
-  .bg-santo:nth-child(1) { top: 5%; left: 10%; transform: rotate(-8deg); }
-  .bg-santo:nth-child(2) { top: 15%; left: 70%; transform: rotate(6deg); }
-  .bg-santo:nth-child(3) { top: 55%; left: 20%; transform: rotate(-4deg); }
-  .bg-santo:nth-child(4) { top: 60%; left: 60%; transform: rotate(5deg); }
-  .bg-santo:nth-child(5) { top: 75%; left: 80%; transform: rotate(-3deg); }
+  @keyframes float {
+    0% { transform: translateY(100vh) rotate(0deg); }
+    100% { transform: translateY(-200px) rotate(360deg); }
+  }
 
+  /* Polaroid central */
   .polaroid {
     width: 320px;
     background: white;
@@ -65,7 +66,7 @@
     position: relative;
     transform: rotate(-2deg);
     transition: transform 0.3s;
-    z-index: 1;
+    z-index: 10;
   }
 
   .polaroid:hover {
@@ -126,7 +127,7 @@
   #sortearBtn {
     padding: 10px 20px;
     font-size: 14px;
-    background: #ffffff; /* mesmo fundo da polaroid */
+    background: white; /* mesmo fundo da polaroid */
     color: #333;
     font-family: 'Special Elite', monospace;
     border: 1px solid #ccc;
@@ -147,13 +148,7 @@
 <body>
 <h1>Conheça seu Santo amigo!</h1>
 
-<div class="background-polaroids">
-  <img src="https://upload.wikimedia.org/wikipedia/pt/thumb/7/78/Carlo_Acutis.jpg/250px-Carlo_Acutis.jpg" class="bg-santo">
-  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXhdKqEy7JDsIq1YNI9ttfyIO7utRM2B6LHA&s" class="bg-santo">
-  <img src="https://comshalom.org/wp-content/uploads/2015/01/08/editorportal/JPII.oculos.jpg" class="bg-santo">
-  <img src="https://www.acn.org.br/wp-content/uploads/2021/02/ACN-Verdadeira-Fisionomia-dos-Santos-Teresinha-Parcendo-mais-velha.jpg" class="bg-santo">
-  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s" class="bg-santo">
-</div>
+<div class="background-polaroid" id="background"></div>
 
 <div class="polaroid">
   <img id="santo-img" src="https://w7.pngwing.com/pngs/528/713/png-transparent-woman-question-mark-female-1000-people-presentation-woman.png" alt="Santo">
@@ -168,39 +163,30 @@
 </div>
 
 <script>
+// lista de santos
 const santos = [
-  {
-    nome: "Carlo Acutis",
-    img: "https://upload.wikimedia.org/wikipedia/pt/thumb/7/78/Carlo_Acutis.jpg/250px-Carlo_Acutis.jpg",
-    frase: "A Eucaristia é a minha estrada para o Céu.",
-    texto: "Jovem italiano apaixonado pela tecnologia, criou um site para divulgar os milagres eucarísticos do mundo. Morreu aos 15 anos.  👉 Com sua amizade, ele pode te ensinar que a santidade é acessível a todos."
-  },
-  {
-    nome: "Pier Giorgio Frassati",
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXhdKqEy7JDsIq1YNI9ttfyIO7utRM2B6LHA&s",
-    frase: "Viver sem fé não é viver, é apenas vegetar.",
-    texto: "Italiano apaixonado por esportes, amigos e caridade. 👉 Com sua amizade, ele pode te ensinar que a fé se vive na amizade, no esporte e na ajuda aos mais pobres."
-  },
-  {
-    nome: "São João Paulo II",
-    img: "https://comshalom.org/wp-content/uploads/2015/01/08/editorportal/JPII.oculos.jpg",
-    frase: "Não tenhais medo. Abri as portas a Cristo!",
-    texto: "Papa de 1978 a 2005, marcando a história com sua proximidade com os jovens. 👉 Com sua amizade, ele pode te ensinar a não ter medo de viver a fé com ousadia e alegria."
-  },
-  {
-    nome: "Santa Teresinha do Menino Jesus",
-    img: "https://www.acn.org.br/wp-content/uploads/2021/02/ACN-Verdadeira-Fisionomia-dos-Santos-Teresinha-Parcendo-mais-velha.jpg",
-    frase: "Quero passar o meu Céu fazendo o bem sobre a Terra.",
-    texto: "Religiosa carmelita, deixou o ensinamento do “caminho da pequena via”. 👉 Com sua amizade, ela pode te ensinar que não é preciso grandes feitos para ser santo, mas fazer tudo com amor."
-  },
-  {
-    nome: "Chiara Luce Badano",
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s",
-    frase: "Se tu queres, Jesus, eu também quero.",
-    texto: "Italiana alegre e generosa, enfrentou um câncer raro aos 18 anos. 👉 Com sua amizade, ela pode te ensinar que até na dor é possível encontrar sentido e viver com amor."
-  }
+  {nome:"Carlo Acutis", img:"https://upload.wikimedia.org/wikipedia/pt/thumb/7/78/Carlo_Acutis.jpg/250px-Carlo_Acutis.jpg", frase:"A Eucaristia é a minha estrada para o Céu.", texto:"Jovem italiano apaixonado pela tecnologia, criou um site para divulgar milagres eucarísticos. 👉 Com sua amizade, ela pode te ensinar que a santidade é acessível a todos."},
+  {nome:"Pier Giorgio Frassati", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXhdKqEy7JDsIq1YNI9ttfyIO7utRM2B6LHA&s", frase:"Viver sem fé não é viver, é apenas vegetar.", texto:"Italiano apaixonado por esportes, amigos e caridade. 👉 Com sua amizade, ele pode te ensinar que a fé se vive na amizade, no esporte e na ajuda aos mais pobres."},
+  {nome:"São João Paulo II", img:"https://comshalom.org/wp-content/uploads/2015/01/08/editorportal/JPII.oculos.jpg", frase:"Não tenhais medo. Abri as portas a Cristo!", texto:"Papa de 1978 a 2005, marcando a história com sua proximidade com os jovens. 👉 Com sua amizade, ele pode te ensinar a não ter medo de viver a fé com ousadia e alegria."},
+  {nome:"Santa Teresinha do Menino Jesus", img:"https://www.acn.org.br/wp-content/uploads/2021/02/ACN-Verdadeira-Fisionomia-dos-Santos-Teresinha-Parcendo-mais-velha.jpg", frase:"Quero passar o meu Céu fazendo o bem sobre a Terra.", texto:"Religiosa carmelita, deixou o ensinamento do 'caminho da pequena via'. 👉 Com sua amizade, ela pode te ensinar que não é preciso grandes feitos para ser santo, mas fazer tudo com amor."},
+  {nome:"Chiara Luce Badano", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s", frase:"Se tu queres, Jesus, eu também quero.", texto:"Italiana alegre e generosa, enfrentou um câncer raro aos 18 anos. 👉 Com sua amizade, ela pode te ensinar que até na dor é possível encontrar sentido e viver com amor."}
 ];
 
+// criação do fundo com polaroids animadas
+const background = document.getElementById('background');
+for(let i=0;i<15;i++){
+  const img = document.createElement('img');
+  const santo = santos[Math.floor(Math.random()*santos.length)];
+  img.src = santo.img;
+  img.style.left = Math.random()*100 + 'vw';
+  img.style.top = (Math.random()*100) + 'vh';
+  img.style.transform = `rotate(${Math.random()*40-20}deg)`;
+  img.style.animationDuration = (10 + Math.random()*15) + 's';
+  if(Math.random()<0.5) img.style.animationDirection = 'reverse';
+  background.appendChild(img);
+}
+
+// função de sorteio
 function sortearSanto() {
   const img = document.getElementById("santo-img");
   const nome = document.getElementById("santo-nome");
@@ -219,7 +205,7 @@ function sortearSanto() {
   const sorteado = santos[Math.floor(Math.random() * santos.length)];
 
   const interval = setInterval(() => {
-    if (width >= 100) {
+    if(width>=100){
       clearInterval(interval);
       loaderText.style.display = "none";
       loaderBarContainer.style.display = "none";
