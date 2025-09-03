@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Amigo Santo</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Special+Elite&display=swap" rel="stylesheet">
+<!-- Fontes -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@700&family=Caprasimo&family=Special+Elite&display=swap" rel="stylesheet">
 
 <style>
   body {
@@ -87,10 +88,9 @@
     object-fit: contain;
     border-radius: 6px;
     display: block;
-    /* começa PB */
     filter: grayscale(100%) brightness(120%);
     opacity: 0;
-    transition: opacity 0.3s linear; /* opacidade revelação */
+    transition: opacity 0.3s linear, filter 0.5s ease-in-out;
   }
 
   .loader-text {
@@ -117,14 +117,16 @@
     transition: width 0.05s linear;
   }
 
+  /* Nome do Santo */
   .santo-nome {
-    font-family: 'Dancing Script', cursive;
+    font-family: 'Caprasimo', cursive;
     font-size: 1.6rem;
     margin-top: 10px;
     opacity: 0;
     transition: opacity 0.4s linear;
   }
 
+  /* Frase e Texto do Santo */
   .santo-frase, .santo-texto {
     font-family: 'Special Elite', monospace;
     font-size: 1rem;
@@ -135,6 +137,15 @@
 
   .santo-frase {
     font-style: italic;
+  }
+
+  /* Mensagem final */
+  .final-msg {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    margin-top: 15px;
+    opacity: 0;
+    transition: opacity 1s ease;
   }
 
   #sortearBtn {
@@ -173,7 +184,6 @@
   <button id="sortearBtn" onclick="sortearSanto()">Conhecer amigo</button>
 </div>
 
-<!-- som de flash (opcional) -->
 <audio id="flashSound">
   <source src="camera-flash.mp3" type="audio/mpeg">
 </audio>
@@ -187,7 +197,7 @@ const santos = [
   {nome:"Chiara Luce Badano", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s", frase:"Se tu queres, Jesus, eu também quero.", texto:"Italiana alegre e generosa, enfrentou um câncer raro aos 18 anos. Com sua amizade, ela pode te ensinar que até na dor é possível encontrar sentido e viver com amor."}
 ];
 
-// cria o fundo com polaroids desfocadas
+// Fundo animado
 const background = document.getElementById('background');
 for(let i=0;i<15;i++){
   const img = document.createElement('img');
@@ -214,43 +224,36 @@ function sortearSanto() {
   const flashSound = document.getElementById("flashSound");
   const polaroid = document.querySelector(".polaroid");
 
-  // botão some já (um sorteio por pessoa)
   btn.style.display = "none";
   loaderText.style.display = "block";
   loaderBarContainer.style.display = "block";
 
-  // sorteia
   const sorteado = santos[Math.floor(Math.random() * santos.length)];
 
-  // prepara imagem e textos (imagem em PB no começo)
   img.src = sorteado.img;
   img.style.opacity = 0;
   img.style.filter = "grayscale(100%) brightness(120%)";
-  // garante que a transição de filter será suave no final
   img.style.transition = "opacity 0.3s linear, filter 0.5s ease-in-out";
 
   nome.textContent = sorteado.nome;
   nome.style.opacity = 0;
 
-  frase.textContent = sorteado.frase;
+  frase.textContent = `"${sorteado.frase}"`;
   texto.textContent = sorteado.texto;
   frase.style.opacity = 0;
   texto.style.opacity = 0;
 
-  // flash + glow
-  try { flashSound.currentTime = 0; flashSound.play(); } catch(e){ /* som opcional */ }
+  try { flashSound.currentTime = 0; flashSound.play(); } catch(e){ }
   glow.style.display = "block";
   glow.style.opacity = 1;
   setTimeout(() => { glow.style.opacity = 0; }, 600);
 
-  // duração total e controle
-  const totalDuration = 5000; // 5s total
-  const revealSteps = 5;     // 5 partes (1s cada)
-  const revealIntervalMs = totalDuration / revealSteps; // 1000ms
-  const shakeTickMs = 50;    // tick de shake suave
+  const totalDuration = 5000;
+  const revealSteps = 5;
+  const revealIntervalMs = totalDuration / revealSteps;
+  const shakeTickMs = 50;
   const startTime = performance.now();
 
-  // reveal (1 passo por segundo): imagem e nome aparecem gradualmente
   let revealIndex = 0;
   const revealTimer = setInterval(() => {
     revealIndex++;
@@ -258,70 +261,45 @@ function sortearSanto() {
     img.style.opacity = frac;
     nome.style.opacity = frac;
 
-    if (revealIndex >= revealSteps) {
-      clearInterval(revealTimer);
-      // garante 1.0
-      img.style.opacity = 1;
-      nome.style.opacity = 1;
-    }
+    if (revealIndex >= revealSteps) clearInterval(revealTimer);
   }, revealIntervalMs);
 
-  // shake contínuo (suave e desacelera conforme o tempo passa)
   const shakeInterval = setInterval(() => {
     const now = performance.now();
     const elapsed = now - startTime;
     const t = Math.min(elapsed, totalDuration);
-    const progress = t / totalDuration; // 0..1
+    const progress = t / totalDuration;
 
-    // loader bar progress
     loaderBar.style.width = (progress * 100) + "%";
 
-    // amplitude decrescente para parar suave
-    const amplitude = 1 - progress; // 1 -> 0
-
-    // movimentos compostos (vibrações múltiplas) para naturalidade
+    const amplitude = 1 - progress;
     const angle = (Math.sin(now / 80) * 6 + Math.sin(now / 140) * 2) * amplitude;
     const x = (Math.sin(now / 100) * 6 + Math.cos(now / 150) * 3) * amplitude;
 
     polaroid.style.transform = `translate(${x}px, 0) rotate(${angle}deg)`;
 
-    // fim do período
     if (elapsed >= totalDuration) {
       clearInterval(shakeInterval);
 
-      // esconder loader
       loaderText.style.display = "none";
       loaderBarContainer.style.display = "none";
 
-      // no final, fazer a transição suave para cor (apenas aqui)
-      // já definimos img.transition acima
       setTimeout(() => {
         img.style.filter = "grayscale(0%) brightness(100%)";
-      }, 200); // pequeno delay para naturalidade
+      }, 200);
 
-      // mostrar frase e texto depois da cor
-setTimeout(() => {
-  frase.style.opacity = 1;
-  texto.style.opacity = 1;
+      setTimeout(() => {
+        frase.style.opacity = 1;
+        texto.style.opacity = 1;
 
-  // cria e mostra a frase final
-  const finalMsg = document.createElement("div");
-  finalMsg.textContent = "Está na hora do desafio! Descobre mais sobre o teu amigo na Igreja de São João do Souto e levanta teu card.";
-  finalMsg.style.fontFamily = "'Special Elite', monospace";
-  finalMsg.style.fontSize = "1rem";
-  finalMsg.style.marginTop = "15px";
-  finalMsg.style.opacity = 0;
-  finalMsg.style.transition = "opacity 1s ease";
-  document.querySelector(".polaroid").appendChild(finalMsg);
+        const finalMsg = document.createElement("div");
+        finalMsg.textContent = "Está na hora do desafio! Descobre mais sobre o teu amigo na Igreja de São João do Souto e até meia noite levanta teu card";
+        finalMsg.classList.add("final-msg");
+        document.querySelector(".polaroid").appendChild(finalMsg);
 
-  // faz aparecer suavemente
-  setTimeout(() => {
-    finalMsg.style.opacity = 1;
-  }, 100);
-}, 800);
+        setTimeout(() => { finalMsg.style.opacity = 1; }, 100);
+      }, 800);
 
-
-      // reposicionar polaroid para descanso final
       polaroid.style.transform = "rotate(-2deg)";
     }
   }, shakeTickMs);
@@ -329,6 +307,8 @@ setTimeout(() => {
 </script>
 </body>
 </html>
+
+
 
 
 
