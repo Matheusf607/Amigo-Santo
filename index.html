@@ -88,7 +88,7 @@
     top: 10px;
     left: 10px;
     width: calc(100% - 20px);
-    height: 350px;
+    height: 300px;
     background: black;
     border-radius: 6px;
     z-index: 2;
@@ -97,11 +97,12 @@
   }
 
   .polaroid img {
-    width: 100%;
-    height: 350px;
+    width: 300px;
+    height: 300px;
     object-fit: contain;
     border-radius: 6px;
     display: block;
+    margin: 0 auto;
     filter: grayscale(100%) brightness(120%);
     opacity: 0;
     transition: opacity 0.3s linear, filter 0.5s ease-in-out;
@@ -134,7 +135,6 @@
   .santo-nome {
     font-family: 'Caprasimo', cursive;
     font-size: 1.6rem;
-    margin-top: 10px;
     opacity: 0;
     transition: opacity 0.4s linear;
   }
@@ -214,7 +214,6 @@ const santos = [
   {nome:"Chiara Luce Badano", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s", frase:"\"Se tu queres, Jesus, eu também quero.\"", texto:"Italiana alegre e generosa, enfrentou um câncer raro aos 18 anos. Com sua amizade, ela pode te ensinar que até na dor é possível encontrar sentido e viver com amor."}
 ];
 
-// cria fundo com polaroids desfocadas
 const background = document.getElementById('background');
 for(let i=0;i<15;i++){
   const img = document.createElement('img');
@@ -249,7 +248,6 @@ function sortearSanto() {
 
   const sorteado = santos[Math.floor(Math.random() * santos.length)];
 
-  // prepara imagem e textos
   img.src = sorteado.img;
   img.style.opacity = 0;
   img.style.filter = "grayscale(100%) brightness(120%)";
@@ -258,12 +256,18 @@ function sortearSanto() {
   nome.textContent = sorteado.nome;
   nome.style.opacity = 0;
 
+  // ajuste de margem só para Santa Teresinha
+  if (sorteado.nome === "Santa Teresinha do Menino Jesus") {
+      nome.style.marginTop = "5px";
+  } else {
+      nome.style.marginTop = "10px";
+  }
+
   frase.textContent = sorteado.frase;
   texto.textContent = sorteado.texto;
   frase.style.opacity = 0;
   texto.style.opacity = 0;
 
-  // flash + glow
   try { flashSound.currentTime = 0; flashSound.play(); } catch(e){ }
   glow.style.display = "block";
   glow.style.opacity = 1;
@@ -281,8 +285,6 @@ function sortearSanto() {
     const frac = Math.min(1, revealIndex / revealSteps);
     img.style.opacity = frac;
     nome.style.opacity = frac;
-
-    // esmaecer quadrado preto junto
     overlay.style.opacity = 1 - frac;
 
     if (revealIndex >= revealSteps) clearInterval(revealTimer);
@@ -308,13 +310,10 @@ function sortearSanto() {
       loaderText.style.display = "none";
       loaderBarContainer.style.display = "none";
 
-      // transição para cor
       setTimeout(() => { img.style.filter = "grayscale(0%) brightness(100%)"; }, 200);
 
-      // mostrar frase e texto
       setTimeout(() => { frase.style.opacity = 1; texto.style.opacity = 1; }, 800);
 
-      // mostrar frase final fora da polaroid
       setTimeout(() => { finalMsg.style.opacity = 1; }, 1200);
 
       polaroid.style.transform = "rotate(-2deg)";
@@ -324,6 +323,8 @@ function sortearSanto() {
 </script>
 </body>
 </html>
+
+
 
 
 
