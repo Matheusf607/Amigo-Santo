@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Amigo Santo</title>
 
-<!-- Fontes -->
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@700&family=Caprasimo&family=Special+Elite&display=swap" rel="stylesheet">
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=Special+Elite&family=Caprasimo&display=swap" rel="stylesheet">
 
 <style>
   body {
@@ -57,7 +57,7 @@
   .polaroid {
     width: 320px;
     background: white;
-    padding: 10px 10px 60px 10px; 
+    padding: 10px 0px 20px 0px; 
     border-radius: 8px;
     box-shadow: 0 12px 25px rgba(0,0,0,0.4);
     display: inline-block;
@@ -80,6 +80,20 @@
     display: none;
     opacity: 0;
     transition: opacity 0.8s ease-in-out;
+  }
+
+  /* Quadrado preto inicial */
+  .photo-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: calc(100% - 20px);
+    height: 350px;
+    background: black;
+    border-radius: 6px;
+    z-index: 2;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
   }
 
   .polaroid img {
@@ -117,7 +131,6 @@
     transition: width 0.05s linear;
   }
 
-  /* Nome do Santo */
   .santo-nome {
     font-family: 'Caprasimo', cursive;
     font-size: 1.6rem;
@@ -126,7 +139,6 @@
     transition: opacity 0.4s linear;
   }
 
-  /* Frase e Texto do Santo */
   .santo-frase, .santo-texto {
     font-family: 'Special Elite', monospace;
     font-size: 1rem;
@@ -137,15 +149,6 @@
 
   .santo-frase {
     font-style: italic;
-  }
-
-  /* Mensagem final */
-  .final-msg {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1rem;
-    margin-top: 15px;
-    opacity: 0;
-    transition: opacity 1s ease;
   }
 
   #sortearBtn {
@@ -163,6 +166,15 @@
   #sortearBtn:hover {
     background: #f0f0f0;
   }
+
+  /* Frase final fora da polaroid */
+  #final-msg {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    margin-top: 20px;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
 </style>
 </head>
 
@@ -173,6 +185,7 @@
 <div class="glow" id="glow"></div>
 
 <div class="polaroid">
+  <div class="photo-overlay" id="photo-overlay"></div>
   <img id="santo-img" src="" alt="Santo">
   <div class="loader-text" id="loader-text">Revelando foto, balance o celular para revelar</div>
   <div class="loader-bar-container" id="loader-bar-container">
@@ -184,20 +197,24 @@
   <button id="sortearBtn" onclick="sortearSanto()">Conhecer amigo</button>
 </div>
 
+<!-- frase final fora da polaroid -->
+<div id="final-msg">Está na hora do desafio! Descobre mais sobre o teu amigo na Igreja de São João do Souto e até meia noite levanta teu card.</div>
+
+<!-- som de flash opcional -->
 <audio id="flashSound">
   <source src="camera-flash.mp3" type="audio/mpeg">
 </audio>
 
 <script>
 const santos = [
-  {nome:"Carlo Acutis", img:"https://upload.wikimedia.org/wikipedia/pt/thumb/7/78/Carlo_Acutis.jpg/250px-Carlo_Acutis.jpg", frase:"A Eucaristia é a minha estrada para o Céu.", texto:"Jovem italiano apaixonado pela tecnologia, criou um site para divulgar milagres eucarísticos. Com sua amizade, ela pode te ensinar que a santidade é acessível a todos."},
-  {nome:"Pier Giorgio Frassati", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXhdKqEy7JDsIq1YNI9ttfyIO7utRM2B6LHA&s", frase:"Viver sem fé não é viver, é apenas vegetar.", texto:"Italiano apaixonado por esportes, amigos e caridade. Com sua amizade, ele pode te ensinar que a fé se vive na amizade, no esporte e na ajuda aos mais pobres."},
-  {nome:"São João Paulo II", img:"https://comshalom.org/wp-content/uploads/2015/01/08/editorportal/JPII.oculos.jpg", frase:"Não tenhais medo. Abri as portas a Cristo!", texto:"Papa de 1978 a 2005, marcando a história com sua proximidade com os jovens. Com sua amizade, ele pode te ensinar a não ter medo de viver a fé com ousadia e alegria."},
-  {nome:"Santa Teresinha do Menino Jesus", img:"https://www.acn.org.br/wp-content/uploads/2021/02/ACN-Verdadeira-Fisionomia-dos-Santos-Teresinha-Parcendo-mais-velha.jpg", frase:"Quero passar o meu Céu fazendo o bem sobre a Terra.", texto:"Religiosa carmelita, deixou o ensinamento do 'caminho da pequena via'. Com sua amizade, ela pode te ensinar que não é preciso grandes feitos para ser santo, mas fazer tudo com amor."},
-  {nome:"Chiara Luce Badano", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s", frase:"Se tu queres, Jesus, eu também quero.", texto:"Italiana alegre e generosa, enfrentou um câncer raro aos 18 anos. Com sua amizade, ela pode te ensinar que até na dor é possível encontrar sentido e viver com amor."}
+  {nome:"Carlo Acutis", img:"https://upload.wikimedia.org/wikipedia/pt/thumb/7/78/Carlo_Acutis.jpg/250px-Carlo_Acutis.jpg", frase:"\"A Eucaristia é a minha estrada para o Céu.\"", texto:"Jovem italiano apaixonado pela tecnologia, criou um site para divulgar milagres eucarísticos. Com sua amizade, ela pode te ensinar que a santidade é acessível a todos."},
+  {nome:"Pier Giorgio Frassati", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXhdKqEy7JDsIq1YNI9ttfyIO7utRM2B6LHA&s", frase:"\"Viver sem fé não é viver, é apenas vegetar.\"", texto:"Italiano apaixonado por esportes, amigos e caridade. Com sua amizade, ele pode te ensinar que a fé se vive na amizade, no esporte e na ajuda aos mais pobres."},
+  {nome:"São João Paulo II", img:"https://comshalom.org/wp-content/uploads/2015/01/08/editorportal/JPII.oculos.jpg", frase:"\"Não tenhais medo. Abri as portas a Cristo!\"", texto:"Papa de 1978 a 2005, marcando a história com sua proximidade com os jovens. Com sua amizade, ele pode te ensinar a não ter medo de viver a fé com ousadia e alegria."},
+  {nome:"Santa Teresinha do Menino Jesus", img:"https://www.acn.org.br/wp-content/uploads/2021/02/ACN-Verdadeira-Fisionomia-dos-Santos-Teresinha-Parcendo-mais-velha.jpg", frase:"\"Quero passar o meu Céu fazendo o bem sobre a Terra.\"", texto:"Religiosa carmelita, deixou o ensinamento do 'caminho da pequena via'. Com sua amizade, ela pode te ensinar que não é preciso grandes feitos para ser santo, mas fazer tudo com amor."},
+  {nome:"Chiara Luce Badano", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s", frase:"\"Se tu queres, Jesus, eu também quero.\"", texto:"Italiana alegre e generosa, enfrentou um câncer raro aos 18 anos. Com sua amizade, ela pode te ensinar que até na dor é possível encontrar sentido e viver com amor."}
 ];
 
-// Fundo animado
+// cria fundo com polaroids desfocadas
 const background = document.getElementById('background');
 for(let i=0;i<15;i++){
   const img = document.createElement('img');
@@ -223,6 +240,8 @@ function sortearSanto() {
   const glow = document.getElementById("glow");
   const flashSound = document.getElementById("flashSound");
   const polaroid = document.querySelector(".polaroid");
+  const overlay = document.getElementById("photo-overlay");
+  const finalMsg = document.getElementById("final-msg");
 
   btn.style.display = "none";
   loaderText.style.display = "block";
@@ -230,6 +249,7 @@ function sortearSanto() {
 
   const sorteado = santos[Math.floor(Math.random() * santos.length)];
 
+  // prepara imagem e textos
   img.src = sorteado.img;
   img.style.opacity = 0;
   img.style.filter = "grayscale(100%) brightness(120%)";
@@ -238,11 +258,12 @@ function sortearSanto() {
   nome.textContent = sorteado.nome;
   nome.style.opacity = 0;
 
-  frase.textContent = `"${sorteado.frase}"`;
+  frase.textContent = sorteado.frase;
   texto.textContent = sorteado.texto;
   frase.style.opacity = 0;
   texto.style.opacity = 0;
 
+  // flash + glow
   try { flashSound.currentTime = 0; flashSound.play(); } catch(e){ }
   glow.style.display = "block";
   glow.style.opacity = 1;
@@ -260,6 +281,9 @@ function sortearSanto() {
     const frac = Math.min(1, revealIndex / revealSteps);
     img.style.opacity = frac;
     nome.style.opacity = frac;
+
+    // esmaecer quadrado preto junto
+    overlay.style.opacity = 1 - frac;
 
     if (revealIndex >= revealSteps) clearInterval(revealTimer);
   }, revealIntervalMs);
@@ -284,21 +308,14 @@ function sortearSanto() {
       loaderText.style.display = "none";
       loaderBarContainer.style.display = "none";
 
-      setTimeout(() => {
-        img.style.filter = "grayscale(0%) brightness(100%)";
-      }, 200);
+      // transição para cor
+      setTimeout(() => { img.style.filter = "grayscale(0%) brightness(100%)"; }, 200);
 
-      setTimeout(() => {
-        frase.style.opacity = 1;
-        texto.style.opacity = 1;
+      // mostrar frase e texto
+      setTimeout(() => { frase.style.opacity = 1; texto.style.opacity = 1; }, 800);
 
-        const finalMsg = document.createElement("div");
-        finalMsg.textContent = "Está na hora do desafio! Descobre mais sobre o teu amigo na Igreja de São João do Souto e até meia noite levanta teu card";
-        finalMsg.classList.add("final-msg");
-        document.querySelector(".polaroid").appendChild(finalMsg);
-
-        setTimeout(() => { finalMsg.style.opacity = 1; }, 100);
-      }, 800);
+      // mostrar frase final fora da polaroid
+      setTimeout(() => { finalMsg.style.opacity = 1; }, 1200);
 
       polaroid.style.transform = "rotate(-2deg)";
     }
@@ -307,6 +324,8 @@ function sortearSanto() {
 </script>
 </body>
 </html>
+
+
 
 
 
