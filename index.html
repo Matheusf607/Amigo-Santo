@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conheça seu amigo Santo</title>
+<title>Amigo Santo</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Special+Elite&display=swap" rel="stylesheet">
 
@@ -25,7 +25,6 @@
     z-index: 10;
   }
 
-  /* Fundo com polaroids desfocadas */
   .background-polaroid {
     position: fixed;
     top: 0;
@@ -54,7 +53,6 @@
     100% { transform: translateY(-200px) rotate(360deg); }
   }
 
-  /* Polaroid central */
   .polaroid {
     width: 320px;
     background: white;
@@ -65,12 +63,22 @@
     margin: 20px auto;
     position: relative;
     transform: rotate(-2deg);
-    transition: transform 0.3s;
     z-index: 10;
   }
 
-  .polaroid:hover {
-    transform: rotate(0deg) scale(1.03);
+  .glow {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 360px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,200,0.3) 0%, rgba(255,255,200,0) 70%);
+    border-radius: 50%;
+    z-index: -1;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
   }
 
   .polaroid img {
@@ -81,7 +89,7 @@
     display: block;
     filter: grayscale(100%) brightness(120%);
     opacity: 0;
-    transition: filter 5s linear, opacity 2s ease-in;
+    transition: opacity 1s linear;
   }
 
   .loader-text {
@@ -112,34 +120,35 @@
     font-family: 'Dancing Script', cursive;
     font-size: 1.6rem;
     margin-top: 10px;
+    opacity: 0;
+    transition: opacity 1s linear;
   }
 
   .santo-frase, .santo-texto {
     font-family: 'Special Elite', monospace;
     font-size: 1rem;
     margin: 5px 10px;
+    opacity: 0;
+    transition: opacity 1s linear;
   }
 
   .santo-frase {
     font-style: italic;
   }
 
-  #sortearBtn {
+  #sortearBtn, #shareBtn {
     padding: 10px 20px;
     font-size: 14px;
-    background: white; /* mesmo fundo da polaroid */
+    background: white;
     color: #333;
     font-family: 'Special Elite', monospace;
     border: 1px solid #ccc;
     border-radius: 6px;
     cursor: pointer;
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    margin-top: 10px;
   }
 
-  #sortearBtn:hover {
+  #sortearBtn:hover, #shareBtn:hover {
     background: #f0f0f0;
   }
 </style>
@@ -149,9 +158,10 @@
 <h1>Conheça seu Santo amigo!</h1>
 
 <div class="background-polaroid" id="background"></div>
+<div class="glow" id="glow"></div>
 
 <div class="polaroid">
-  <img id="santo-img" src="https://w7.pngwing.com/pngs/528/713/png-transparent-woman-question-mark-female-1000-people-presentation-woman.png" alt="Santo">
+  <img id="santo-img" src="" alt="Santo">
   <div class="loader-text" id="loader-text">Revelando foto, balance o celular para revelar</div>
   <div class="loader-bar-container" id="loader-bar-container">
     <div class="loader-bar" id="loader-bar"></div>
@@ -160,19 +170,23 @@
   <div class="santo-frase" id="santo-frase"></div>
   <div class="santo-texto" id="santo-texto"></div>
   <button id="sortearBtn" onclick="sortearSanto()">Conhecer amigo</button>
+  <button id="shareBtn" onclick="shareInstagram()">Compartilhar</button>
 </div>
 
+<audio id="flashSound">
+  <source src="camera-flash.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-// lista de santos
 const santos = [
-  {nome:"Carlo Acutis", img:"https://upload.wikimedia.org/wikipedia/pt/thumb/7/78/Carlo_Acutis.jpg/250px-Carlo_Acutis.jpg", frase:"A Eucaristia é a minha estrada para o Céu.", texto:"Jovem italiano apaixonado pela tecnologia, criou um site para divulgar milagres eucarísticos.Com sua amizade, ela pode te ensinar que a santidade é acessível a todos."},
+  {nome:"Carlo Acutis", img:"https://upload.wikimedia.org/wikipedia/pt/thumb/7/78/Carlo_Acutis.jpg/250px-Carlo_Acutis.jpg", frase:"A Eucaristia é a minha estrada para o Céu.", texto:"Jovem italiano apaixonado pela tecnologia, criou um site para divulgar milagres eucarísticos. Com sua amizade, ela pode te ensinar que a santidade é acessível a todos."},
   {nome:"Pier Giorgio Frassati", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXhdKqEy7JDsIq1YNI9ttfyIO7utRM2B6LHA&s", frase:"Viver sem fé não é viver, é apenas vegetar.", texto:"Italiano apaixonado por esportes, amigos e caridade. Com sua amizade, ele pode te ensinar que a fé se vive na amizade, no esporte e na ajuda aos mais pobres."},
-  {nome:"São João Paulo II", img:"https://comshalom.org/wp-content/uploads/2015/01/08/editorportal/JPII.oculos.jpg", frase:"Não tenhais medo. Abri as portas a Cristo!", texto:"Papa de 1978 a 2005, marcando a história com sua proximidade com os jovens.Com sua amizade, ele pode te ensinar a não ter medo de viver a fé com ousadia e alegria."},
-  {nome:"Santa Teresinha do Menino Jesus", img:"https://www.acn.org.br/wp-content/uploads/2021/02/ACN-Verdadeira-Fisionomia-dos-Santos-Teresinha-Parcendo-mais-velha.jpg", frase:"Quero passar o meu Céu fazendo o bem sobre a Terra.", texto:"Religiosa carmelita, deixou o ensinamento do 'caminho da pequena via'.  Com sua amizade, ela pode te ensinar que não é preciso grandes feitos para ser santo, mas fazer tudo com amor."},
-  {nome:"Chiara Luce Badano", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s", frase:"Se tu queres, Jesus, eu também quero.", texto:"Italiana alegre e generosa, enfrentou um câncer raro aos 18 anos.Com sua amizade, ela pode te ensinar que até na dor é possível encontrar sentido e viver com amor."}
+  {nome:"São João Paulo II", img:"https://comshalom.org/wp-content/uploads/2015/01/08/editorportal/JPII.oculos.jpg", frase:"Não tenhais medo. Abri as portas a Cristo!", texto:"Papa de 1978 a 2005, marcando a história com sua proximidade com os jovens. Com sua amizade, ele pode te ensinar a não ter medo de viver a fé com ousadia e alegria."},
+  {nome:"Santa Teresinha do Menino Jesus", img:"https://www.acn.org.br/wp-content/uploads/2021/02/ACN-Verdadeira-Fisionomia-dos-Santos-Teresinha-Parcendo-mais-velha.jpg", frase:"Quero passar o meu Céu fazendo o bem sobre a Terra.", texto:"Religiosa carmelita, deixou o ensinamento do 'caminho da pequena via'. Com sua amizade, ela pode te ensinar que não é preciso grandes feitos para ser santo, mas fazer tudo com amor."},
+  {nome:"Chiara Luce Badano", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s", frase:"Se tu queres, Jesus, eu também quero.", texto:"Italiana alegre e generosa, enfrentou um câncer raro aos 18 anos. Com sua amizade, ela pode te ensinar que até na dor é possível encontrar sentido e viver com amor."}
 ];
 
-// criação do fundo com polaroids animadas
+// Fundo animado
 const background = document.getElementById('background');
 for(let i=0;i<15;i++){
   const img = document.createElement('img');
@@ -186,7 +200,10 @@ for(let i=0;i<15;i++){
   background.appendChild(img);
 }
 
-// função de sorteio
+function shareInstagram(){
+  window.open('https://www.instagram.com/', '_blank');
+}
+
 function sortearSanto() {
   const img = document.getElementById("santo-img");
   const nome = document.getElementById("santo-nome");
@@ -196,32 +213,75 @@ function sortearSanto() {
   const loaderText = document.getElementById("loader-text");
   const loaderBarContainer = document.getElementById("loader-bar-container");
   const loaderBar = document.getElementById("loader-bar");
+  const glow = document.getElementById("glow");
+  const flashSound = document.getElementById("flashSound");
+  const polaroid = document.querySelector(".polaroid");
 
   btn.style.display = "none";
   loaderText.style.display = "block";
   loaderBarContainer.style.display = "block";
 
-  let width = 0;
   const sorteado = santos[Math.floor(Math.random() * santos.length)];
 
-  const interval = setInterval(() => {
-    if(width>=100){
+  // Foto já do santo
+  img.src = sorteado.img;
+  img.style.opacity = 0;
+  nome.innerText = sorteado.nome;
+  nome.style.opacity = 0;
+  frase.innerText = sorteado.frase;
+  texto.innerText = sorteado.texto;
+  frase.style.opacity = 0;
+  texto.style.opacity = 0;
+
+  flashSound.currentTime = 0;
+  flashSound.play();
+
+  glow.style.display = "block";
+  glow.style.opacity = 1;
+  setTimeout(() => { glow.style.opacity = 0; }, 800);
+
+  const totalDuration = 5000; // 5s shake
+  const intervalTime = 50; 
+  const totalSteps = totalDuration / intervalTime;
+  let step = 0;
+
+  // 5 partes de revelação da foto e nome
+  const revealTimes = [1000,2000,3000,4000,5000];
+  let revealIndex = 0;
+
+  const interval = setInterval(()=>{
+    step++;
+    const currentTime = step * intervalTime;
+
+    loaderBar.style.width = (currentTime/totalDuration*100) + "%";
+
+    // Shake rápido, suave no final
+    const amplitude = 1 - currentTime/totalDuration;
+    const angle = Math.sin(step/2)*5*amplitude + Math.sin(step/3)*2*amplitude;
+    const x = Math.sin(step/2.5)*4*amplitude + Math.cos(step/3.5)*2*amplitude;
+    polaroid.style.transform = `translate(${x}px,0) rotate(${angle}deg)`;
+
+    // Revelar gradualmente foto e nome
+    if(revealIndex < revealTimes.length && currentTime >= revealTimes[revealIndex]){
+      img.style.opacity = (revealIndex+1)/revealTimes.length;
+      nome.style.opacity = (revealIndex+1)/revealTimes.length;
+      revealIndex++;
+    }
+
+    // Finalizar shake
+    if(step >= totalSteps){
       clearInterval(interval);
       loaderText.style.display = "none";
       loaderBarContainer.style.display = "none";
-
-      img.src = sorteado.img;
       img.style.opacity = 1;
-      img.style.filter = "grayscale(0%) brightness(100%)";
+      nome.style.opacity = 1;
 
-      nome.innerText = sorteado.nome;
-      frase.innerText = sorteado.frase;
-      texto.innerText = sorteado.texto;
-    } else {
-      width += 2;
-      loaderBar.style.width = width + "%";
+      // Aparecer texto e frase suavemente
+      setTimeout(()=>{ frase.style.opacity = 1; texto.style.opacity = 1; }, 200);
+      polaroid.style.transform = "rotate(-2deg)";
     }
-  }, 100);
+
+  }, intervalTime);
 }
 </script>
 </body>
