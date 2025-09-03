@@ -8,154 +8,170 @@
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Special+Elite&display=swap" rel="stylesheet">
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 50px;
-  text-align: center;
-  background: #f0f0f0;
-  overflow-x: hidden;
-  position: relative;
-}
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 50px;
+    text-align: center;
+    background: #f0f0f0;
+    overflow-x: hidden;
+    position: relative;
+  }
 
-h1 {
-  color: #333;
-  margin-bottom: 40px;
-  position: relative;
-  z-index: 10;
-}
+  h1 {
+    color: #333;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 10;
+  }
 
-.background-polaroid {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
-}
+  .background-polaroid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
 
-.background-polaroid img {
-  width: 120px;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 6px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-  position: absolute;
-  opacity: 0.1;
-  filter: blur(3px);
-  animation: float linear infinite;
-}
+  .background-polaroid img {
+    width: 120px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    position: absolute;
+    opacity: 0.1;
+    filter: blur(3px);
+    animation: float linear infinite;
+  }
 
-@keyframes float {
-  0% { transform: translateY(100vh) rotate(0deg); }
-  100% { transform: translateY(-200px) rotate(360deg); }
-}
+  @keyframes float {
+    0% { transform: translateY(100vh) rotate(0deg); }
+    100% { transform: translateY(-200px) rotate(360deg); }
+  }
 
-.polaroid {
-  width: 320px;
-  background: white;
-  padding: 10px 10px 60px 10px; 
-  border-radius: 8px;
-  box-shadow: 0 12px 25px rgba(0,0,0,0.4);
-  display: inline-block;
-  margin: 20px auto;
-  position: relative;
-  transform: rotate(-2deg);
-  z-index: 10;
-}
+  .polaroid {
+    width: 320px;
+    background: white;
+    padding: 10px 10px 60px 10px; 
+    border-radius: 8px;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+    display: inline-block;
+    margin: 20px auto;
+    position: relative;
+    transform: rotate(-2deg);
+    z-index: 10;
+  }
 
-.glow {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 360px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(255,255,200,0.3) 0%, rgba(255,255,200,0) 70%);
-  border-radius: 50%;
-  z-index: -1;
-  display: none;
-  opacity: 0;
-  transition: opacity 0.8s ease-in-out;
-}
+  .glow {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 360px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,200,0.3) 0%, rgba(255,255,200,0) 70%);
+    border-radius: 50%;
+    z-index: -1;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+  }
 
-.polaroid img {
-  width: 100%;
-  height: 350px;
-  object-fit: contain;
-  border-radius: 6px;
-  display: block;
-  filter: grayscale(100%) brightness(120%);
-  opacity: 0;
-  transition: filter 1s linear, opacity 0.5s ease-in;
-}
+  .polaroid img {
+    width: 100%;
+    height: 350px;
+    object-fit: contain;
+    border-radius: 6px;
+    display: block;
+    filter: grayscale(100%) brightness(120%);
+    opacity: 0;
+    transition: opacity 1s linear;
+  }
 
-.loader-text {
-  font-family: 'Special Elite', monospace;
-  font-size: 1rem;
-  margin: 10px 0;
-  display: none;
-}
+  /* Efeito de cor subindo */
+  .reveal-color {
+    animation: colorUp 1s forwards;
+  }
 
-.loader-bar-container {
-  width: 90%;
-  height: 10px;
-  background: #ddd;
-  border-radius: 5px;
-  margin: 10px auto;
-  overflow: hidden;
-  display: none;
-}
+  @keyframes colorUp {
+    0% {
+      clip-path: inset(100% 0 0 0);
+      filter: grayscale(100%);
+    }
+    100% {
+      clip-path: inset(0 0 0 0);
+      filter: grayscale(0%);
+    }
+  }
 
-.loader-bar {
-  width: 0%;
-  height: 100%;
-  background: #3498db;
-  transition: width 0.1s linear;
-}
+  .loader-text {
+    font-family: 'Special Elite', monospace;
+    font-size: 1rem;
+    margin: 10px 0;
+    display: none;
+  }
 
-.santo-nome {
-  font-family: 'Dancing Script', cursive;
-  font-size: 1.6rem;
-  margin-top: 10px;
-  opacity: 0;
-  transition: opacity 0.5s ease-in;
-}
+  .loader-bar-container {
+    width: 90%;
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+    margin: 10px auto;
+    overflow: hidden;
+    display: none;
+  }
 
-.santo-frase, .santo-texto {
-  font-family: 'Special Elite', monospace;
-  font-size: 1rem;
-  margin: 5px 10px;
-  opacity: 0;
-  transition: opacity 1s ease-in;
-}
+  .loader-bar {
+    width: 0%;
+    height: 100%;
+    background: #3498db;
+    transition: width 0.1s linear;
+  }
 
-.santo-frase {
-  font-style: italic;
-}
+  .santo-nome {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.6rem;
+    margin-top: 10px;
+    opacity: 0;
+    transition: opacity 1s linear;
+  }
 
-#sortearBtn, #shareBtn {
-  padding: 10px 20px;
-  font-size: 14px;
-  background: white;
-  color: #333;
-  font-family: 'Special Elite', monospace;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 10px;
-}
+  .santo-frase, .santo-texto {
+    font-family: 'Special Elite', monospace;
+    font-size: 1rem;
+    margin: 5px 10px;
+    opacity: 0;
+    transition: opacity 1s linear;
+  }
 
-#sortearBtn:hover, #shareBtn:hover {
-  background: #f0f0f0;
-}
+  .santo-frase {
+    font-style: italic;
+  }
+
+  #sortearBtn {
+    padding: 10px 20px;
+    font-size: 14px;
+    background: white;
+    color: #333;
+    font-family: 'Special Elite', monospace;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  #sortearBtn:hover {
+    background: #f0f0f0;
+  }
 </style>
 </head>
 
 <body>
-<h1>Conheça seu Santo amigo!</h1>
+<h1>Está na hora do desafio! Descobre mais sobre o teu amigo na Igreja de São João do Souto e levanta teu card.</h1>
 
 <div class="background-polaroid" id="background"></div>
 <div class="glow" id="glow"></div>
@@ -170,8 +186,11 @@ h1 {
   <div class="santo-frase" id="santo-frase"></div>
   <div class="santo-texto" id="santo-texto"></div>
   <button id="sortearBtn" onclick="sortearSanto()">Conhecer amigo</button>
-  <button id="shareBtn" onclick="shareInstagram()">Compartilhar</button>
 </div>
+
+<audio id="flashSound">
+  <source src="camera-flash.mp3" type="audio/mpeg">
+</audio>
 
 <script>
 const santos = [
@@ -182,6 +201,7 @@ const santos = [
   {nome:"Chiara Luce Badano", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s", frase:"Se tu queres, Jesus, eu também quero.", texto:"Italiana alegre e generosa, enfrentou um câncer raro aos 18 anos. Com sua amizade, ela pode te ensinar que até na dor é possível encontrar sentido e viver com amor."}
 ];
 
+// Fundo animado
 const background = document.getElementById('background');
 for(let i=0;i<15;i++){
   const img = document.createElement('img');
@@ -195,11 +215,6 @@ for(let i=0;i<15;i++){
   background.appendChild(img);
 }
 
-function shareInstagram(){
-  const url = encodeURIComponent(window.location.href);
-  window.open(`https://www.instagram.com/sharer/sharer.php?u=${url}`, '_blank');
-}
-
 function sortearSanto() {
   const img = document.getElementById("santo-img");
   const nome = document.getElementById("santo-nome");
@@ -210,61 +225,80 @@ function sortearSanto() {
   const loaderBarContainer = document.getElementById("loader-bar-container");
   const loaderBar = document.getElementById("loader-bar");
   const glow = document.getElementById("glow");
+  const flashSound = document.getElementById("flashSound");
   const polaroid = document.querySelector(".polaroid");
 
   btn.style.display = "none";
   loaderText.style.display = "block";
   loaderBarContainer.style.display = "block";
 
+  const sorteado = santos[Math.floor(Math.random() * santos.length)];
+
+  img.src = sorteado.img;
+  img.style.opacity = 0;
+  nome.innerText = sorteado.nome;
+  nome.style.opacity = 0;
+  frase.innerText = sorteado.frase;
+  texto.innerText = sorteado.texto;
+  frase.style.opacity = 0;
+  texto.style.opacity = 0;
+
+  flashSound.currentTime = 0;
+  flashSound.play();
+
   glow.style.display = "block";
   glow.style.opacity = 1;
   setTimeout(() => { glow.style.opacity = 0; }, 800);
 
-  const sorteado = santos[Math.floor(Math.random() * santos.length)];
-  img.src = sorteado.img;
-  img.style.opacity = 0;
-  img.style.filter = "grayscale(100%) brightness(120%)";
-
-  nome.style.opacity = 0;
-  frase.style.opacity = 0;
-  texto.style.opacity = 0;
-
-  const totalSteps = 5; // 5 segundos
+  const totalDuration = 5000;
+  const intervalTime = 50; 
+  const totalSteps = totalDuration / intervalTime;
   let step = 0;
+
+  const revealTimes = [1000,2000,3000,4000,5000];
+  let revealIndex = 0;
 
   const interval = setInterval(()=>{
     step++;
-    loaderBar.style.width = (step/totalSteps*100) + "%";
+    const currentTime = step * intervalTime;
+    loaderBar.style.width = (currentTime/totalDuration*100) + "%";
 
-    // Shake com amplitude decrescente
-    const amplitude = (totalSteps-step)/totalSteps;
-    const angle = Math.sin(step * 0.6) * 5 * amplitude;
-    const x = Math.sin(step * 0.5) * 4 * amplitude;
+    const amplitude = 1 - currentTime/totalDuration;
+    const angle = Math.sin(step/2)*5*amplitude + Math.sin(step/3)*2*amplitude;
+    const x = Math.sin(step/2.5)*4*amplitude + Math.cos(step/3.5)*2*amplitude;
     polaroid.style.transform = `translate(${x}px,0) rotate(${angle}deg)`;
 
-    // Revelação gradual da imagem e nome
-    img.style.opacity = Math.min(1, step/totalSteps);
-    nome.style.opacity = Math.min(1, step/totalSteps);
+    if(revealIndex < revealTimes.length && currentTime >= revealTimes[revealIndex]){
+      img.style.opacity = (revealIndex+1)/revealTimes.length;
+      nome.style.opacity = (revealIndex+1)/revealTimes.length;
+      revealIndex++;
+    }
 
     if(step >= totalSteps){
       clearInterval(interval);
       loaderText.style.display = "none";
       loaderBarContainer.style.display = "none";
       img.style.opacity = 1;
-      img.style.filter = "grayscale(0%) brightness(100%)"; // colorido
-      polaroid.style.transform = "rotate(-2deg)";
+      nome.style.opacity = 1;
 
-      // Revelar frase e texto após final
-      setTimeout(()=>{
-        frase.style.opacity = 1;
-        texto.style.opacity = 1;
-      }, 500);
+      // Aqui começa o efeito de cor subindo
+      img.classList.add("reveal-color");
+
+      setTimeout(()=>{ 
+        frase.style.opacity = 1; 
+        texto.style.opacity = 1; 
+      }, 1000);
+
+      polaroid.style.transform = "rotate(-2deg)";
     }
-  }, 1000); // 1 passo por segundo
+
+  }, intervalTime);
 }
 </script>
 </body>
 </html>
+
+
 
 
 
