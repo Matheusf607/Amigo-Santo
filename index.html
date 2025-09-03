@@ -87,25 +87,10 @@
     object-fit: contain;
     border-radius: 6px;
     display: block;
+    /* começa PB */
     filter: grayscale(100%) brightness(120%);
     opacity: 0;
-    transition: opacity 1s linear;
-  }
-
-  /* Efeito de cor subindo */
-  .reveal-color {
-    animation: colorUp 1s forwards;
-  }
-
-  @keyframes colorUp {
-    0% {
-      clip-path: inset(100% 0 0 0);
-      filter: grayscale(100%);
-    }
-    100% {
-      clip-path: inset(0 0 0 0);
-      filter: grayscale(0%);
-    }
+    transition: opacity 0.3s linear; /* opacidade revelação */
   }
 
   .loader-text {
@@ -129,7 +114,7 @@
     width: 0%;
     height: 100%;
     background: #3498db;
-    transition: width 0.1s linear;
+    transition: width 0.05s linear;
   }
 
   .santo-nome {
@@ -137,7 +122,7 @@
     font-size: 1.6rem;
     margin-top: 10px;
     opacity: 0;
-    transition: opacity 1s linear;
+    transition: opacity 0.4s linear;
   }
 
   .santo-frase, .santo-texto {
@@ -145,7 +130,7 @@
     font-size: 1rem;
     margin: 5px 10px;
     opacity: 0;
-    transition: opacity 1s linear;
+    transition: opacity 0.5s linear;
   }
 
   .santo-frase {
@@ -171,7 +156,7 @@
 </head>
 
 <body>
-<h1>Está na hora do desafio! Descobre mais sobre o teu amigo na Igreja de São João do Souto e levanta teu card.</h1>
+<h1>Conheça seu Santo amigo!</h1>
 
 <div class="background-polaroid" id="background"></div>
 <div class="glow" id="glow"></div>
@@ -188,6 +173,7 @@
   <button id="sortearBtn" onclick="sortearSanto()">Conhecer amigo</button>
 </div>
 
+<!-- som de flash (opcional) -->
 <audio id="flashSound">
   <source src="camera-flash.mp3" type="audio/mpeg">
 </audio>
@@ -201,7 +187,7 @@ const santos = [
   {nome:"Chiara Luce Badano", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQLElPJkd3b8aKuNYRrNd2wT9rfP88WNBgCw&s", frase:"Se tu queres, Jesus, eu também quero.", texto:"Italiana alegre e generosa, enfrentou um câncer raro aos 18 anos. Com sua amizade, ela pode te ensinar que até na dor é possível encontrar sentido e viver com amor."}
 ];
 
-// Fundo animado
+// cria o fundo com polaroids desfocadas
 const background = document.getElementById('background');
 for(let i=0;i<15;i++){
   const img = document.createElement('img');
@@ -228,71 +214,101 @@ function sortearSanto() {
   const flashSound = document.getElementById("flashSound");
   const polaroid = document.querySelector(".polaroid");
 
+  // botão some já (um sorteio por pessoa)
   btn.style.display = "none";
   loaderText.style.display = "block";
   loaderBarContainer.style.display = "block";
 
+  // sorteia
   const sorteado = santos[Math.floor(Math.random() * santos.length)];
 
+  // prepara imagem e textos (imagem em PB no começo)
   img.src = sorteado.img;
   img.style.opacity = 0;
-  nome.innerText = sorteado.nome;
+  img.style.filter = "grayscale(100%) brightness(120%)";
+  // garante que a transição de filter será suave no final
+  img.style.transition = "opacity 0.3s linear, filter 0.5s ease-in-out";
+
+  nome.textContent = sorteado.nome;
   nome.style.opacity = 0;
-  frase.innerText = sorteado.frase;
-  texto.innerText = sorteado.texto;
+
+  frase.textContent = sorteado.frase;
+  texto.textContent = sorteado.texto;
   frase.style.opacity = 0;
   texto.style.opacity = 0;
 
-  flashSound.currentTime = 0;
-  flashSound.play();
-
+  // flash + glow
+  try { flashSound.currentTime = 0; flashSound.play(); } catch(e){ /* som opcional */ }
   glow.style.display = "block";
   glow.style.opacity = 1;
-  setTimeout(() => { glow.style.opacity = 0; }, 800);
+  setTimeout(() => { glow.style.opacity = 0; }, 600);
 
-  const totalDuration = 5000;
-  const intervalTime = 50; 
-  const totalSteps = totalDuration / intervalTime;
-  let step = 0;
+  // duração total e controle
+  const totalDuration = 5000; // 5s total
+  const revealSteps = 5;     // 5 partes (1s cada)
+  const revealIntervalMs = totalDuration / revealSteps; // 1000ms
+  const shakeTickMs = 50;    // tick de shake suave
+  const startTime = performance.now();
 
-  const revealTimes = [1000,2000,3000,4000,5000];
+  // reveal (1 passo por segundo): imagem e nome aparecem gradualmente
   let revealIndex = 0;
+  const revealTimer = setInterval(() => {
+    revealIndex++;
+    const frac = Math.min(1, revealIndex / revealSteps);
+    img.style.opacity = frac;
+    nome.style.opacity = frac;
 
-  const interval = setInterval(()=>{
-    step++;
-    const currentTime = step * intervalTime;
-    loaderBar.style.width = (currentTime/totalDuration*100) + "%";
-
-    const amplitude = 1 - currentTime/totalDuration;
-    const angle = Math.sin(step/2)*5*amplitude + Math.sin(step/3)*2*amplitude;
-    const x = Math.sin(step/2.5)*4*amplitude + Math.cos(step/3.5)*2*amplitude;
-    polaroid.style.transform = `translate(${x}px,0) rotate(${angle}deg)`;
-
-    if(revealIndex < revealTimes.length && currentTime >= revealTimes[revealIndex]){
-      img.style.opacity = (revealIndex+1)/revealTimes.length;
-      nome.style.opacity = (revealIndex+1)/revealTimes.length;
-      revealIndex++;
-    }
-
-    if(step >= totalSteps){
-      clearInterval(interval);
-      loaderText.style.display = "none";
-      loaderBarContainer.style.display = "none";
+    if (revealIndex >= revealSteps) {
+      clearInterval(revealTimer);
+      // garante 1.0
       img.style.opacity = 1;
       nome.style.opacity = 1;
+    }
+  }, revealIntervalMs);
 
-      // Aqui começa o efeito de cor subindo
-      img.classList.add("reveal-color");
+  // shake contínuo (suave e desacelera conforme o tempo passa)
+  const shakeInterval = setInterval(() => {
+    const now = performance.now();
+    const elapsed = now - startTime;
+    const t = Math.min(elapsed, totalDuration);
+    const progress = t / totalDuration; // 0..1
 
-      setTimeout(()=>{ 
-        frase.style.opacity = 1; 
-        texto.style.opacity = 1; 
-      }, 1000);
+    // loader bar progress
+    loaderBar.style.width = (progress * 100) + "%";
 
+    // amplitude decrescente para parar suave
+    const amplitude = 1 - progress; // 1 -> 0
+
+    // movimentos compostos (vibrações múltiplas) para naturalidade
+    const angle = (Math.sin(now / 80) * 6 + Math.sin(now / 140) * 2) * amplitude;
+    const x = (Math.sin(now / 100) * 6 + Math.cos(now / 150) * 3) * amplitude;
+
+    polaroid.style.transform = `translate(${x}px, 0) rotate(${angle}deg)`;
+
+    // fim do período
+    if (elapsed >= totalDuration) {
+      clearInterval(shakeInterval);
+
+      // esconder loader
+      loaderText.style.display = "none";
+      loaderBarContainer.style.display = "none";
+
+      // no final, fazer a transição suave para cor (apenas aqui)
+      // já definimos img.transition acima
+      setTimeout(() => {
+        img.style.filter = "grayscale(0%) brightness(100%)";
+      }, 200); // pequeno delay para naturalidade
+
+      // mostrar frase e texto depois da cor
+      setTimeout(() => {
+        frase.style.opacity = 1;
+        texto.style.opacity = 1;
+      }, 800);
+
+      // reposicionar polaroid para descanso final
       polaroid.style.transform = "rotate(-2deg)";
     }
-
-  }, intervalTime);
+  }, shakeTickMs);
 }
 </script>
 </body>
