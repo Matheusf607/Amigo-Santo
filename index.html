@@ -300,19 +300,26 @@ function sortearSanto() {
       }, 200); // pequeno delay para naturalidade
 
       // mostrar frase e texto depois da cor
-      setTimeout(() => {
-        frase.style.opacity = 1;
-        texto.style.opacity = 1;
-      }, 800);
+setTimeout(() => {
+  frase.style.opacity = 1;
+  texto.style.opacity = 1;
 
-      // reposicionar polaroid para descanso final
-      polaroid.style.transform = "rotate(-2deg)";
-    }
-  }, shakeTickMs);
-}
-</script>
-</body>
-</html>
+  // cria e mostra a frase final
+  const finalMsg = document.createElement("div");
+  finalMsg.textContent = "Está na hora do desafio! Descobre mais sobre o teu amigo na Igreja de São João do Souto e levanta teu card.";
+  finalMsg.style.fontFamily = "'Special Elite', monospace";
+  finalMsg.style.fontSize = "1rem";
+  finalMsg.style.marginTop = "15px";
+  finalMsg.style.opacity = 0;
+  finalMsg.style.transition = "opacity 1s ease";
+  document.querySelector(".polaroid").appendChild(finalMsg);
+
+  // faz aparecer suavemente
+  setTimeout(() => {
+    finalMsg.style.opacity = 1;
+  }, 100);
+}, 800);
+
 
 
 
